@@ -1,0 +1,11 @@
+image:
+  repository: ghcr.io/quartermasters/llms
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  limits:
+    nvidia.com/gpu: 1

@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  llms:
+    image: ghcr.io/quartermasters/llms:latest
+    container_name: llms
+    restart: unless-stopped
+    environment:
+      - TZ=UTC
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/opt/llms/data
+      - ./models:/opt/llms/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu]
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+    volumes:
+      - ./qdrant_storage:/qdrant/storage
+
+  postgres:
+    image: postgres:15
+    container_name: llms-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: llms
+      POSTGRES_PASSWORD: llms_secure
+      POSTGRES_DB: llms_logs
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
